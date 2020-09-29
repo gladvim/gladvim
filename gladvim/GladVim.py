@@ -36,6 +36,9 @@ class GladVim:
             self.db.migrate()
 
     def fetch(self, package):
+        if package == 'gladvim':
+            return NOT_OK, 'gladvim is not a vim plugin'
+
         if self.db.fetched(package):
             return OK, 'already fetched'
 
@@ -105,6 +108,15 @@ class GladVim:
                 GladVim.remove_all(vim_subdir, package)
 
         self.db.set_plugged(package, status=False)
+
+    def selfdestruct(self, rm):
+        """ :param rm: specifies whether to remove installed plugins. """
+        if rm:
+            for package in self.db.installed_plugins():
+                self.unplug(package)
+                self.remove(package)
+
+        rmtree(self.LOCAL)
 
     @staticmethod
     def git_clone(package):

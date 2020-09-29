@@ -47,6 +47,12 @@ class DB:
     WHERE name=?;
     """
 
+    INSTALLED = """
+    SELECT name
+    FROM plugins
+    WHERE local=1 AND plug=1;
+    """
+
     def __init__(self, path):
         self.conn = sqlite3.connect(path)
         self.curs = self.conn.cursor()
@@ -81,3 +87,8 @@ class DB:
         self.execute(DB.PLUGGED, (package,))
         boolean = self.curs.fetchone()
         return boolean and boolean[0]
+
+    def installed_plugins(self):
+        self.execute(DB.INSTALLED)
+        for row in self.curs.fetchall():
+            yield row[0]
